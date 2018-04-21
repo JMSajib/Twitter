@@ -1,0 +1,8 @@
+{% if object_list %}
+  {% for obj in object_list %}
+    <h2>Author: {{obj.user}}</h2>
+    <h2>Content: {{obj.content}}</h2>
+    <h3>created {{obj.timestamp}}</h3>
+    {# <h3>{{obj.updated}}</h3> #}
+  {% endfor %}
+{% endif %}
