@@ -1,5 +1,5 @@
 <form method="POST">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit" name="button">{{ btn_title }}</button>
+  <button class="btn btn-primary" type="submit" name="button">{{ btn_title }}</button>
 </form>

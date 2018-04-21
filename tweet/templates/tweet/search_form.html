@@ -1,4 +1,8 @@
-<form class="" action='{% url "tweet:list" %}' method="GET">
-  <input type="text" name="q" placeholder="Search..." value="{{ request.GET.q }}">
-  <input type="submit" value="Search">
-</form>
+<div class="row">
+  <div class="col-sm-12 text-center">
+    <form class="form-inline" action='{% url "tweet:list" %}' method="GET">
+      <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search" value="{{ request.GET.q }}" aria-label="Search">
+    <button class="btn btn-success" type="submit">Search</button>
+    </form>
+  </div>
+</div>

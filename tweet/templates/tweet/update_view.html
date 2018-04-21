@@ -1,1 +1,6 @@
-{% include "tweet/form.html" with form=form btn_title='Update' %}
+{% extends "base.html" %}
+{% block content %}
+  <br>
+  <h2>Update Your Tweet</h2><br>
+  {% include "tweet/form.html" with form=form btn_title='Update' %}
+{% endblock %}

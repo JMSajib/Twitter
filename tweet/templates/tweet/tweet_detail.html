@@ -1,6 +1,10 @@
-<h1>Detail About Tweet</h1>
+{% extends "base.html" %}
+{% block content %}
+  <br>
+  <h1>Detail About Tweet</h1><hr>
 {% if object %}
     <h2>{{ object.user }}</h2>
     <h2>{{ object.content }}</h2>
-    <h2>{{ object.timestamp }}</h2>
+    <h2>{{ object.timestamp|timesince }} ago</h2>
 {% endif %}
+{% endblock %}
