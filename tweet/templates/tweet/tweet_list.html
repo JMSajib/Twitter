@@ -49,7 +49,6 @@ function getParameterByName(name, url) {
         },
         method:"GET",
         success:function(data){
-          // console.log(data)
           tweetList = data
           parseTweets()
         },
@@ -60,24 +59,56 @@ function getParameterByName(name, url) {
       })
     }
     fetchTweets()
+
+    var charStart = 140;
+    var charCurrent = 0;
+    $("#tweet-form").append("<span id='tweetChrasLeft'>140</span>")
+
+    $("#tweet-form textarea").keyup(function(event){
+      var tweetValue = $(this).val()
+      charCurrent = charStart - tweetValue.length
+      $("#tweetChrasLeft").text(charCurrent)
+
+      if(charCurrent > 0){
+        $("#tweetChrasLeft").removeClass("grey-color")
+        $("#tweetChrasLeft").removeClass("red-color")
+        $("#tweetChrasLeft").addClass("green-color")
+      }
+      else if(charCurrent == 0){
+        $("#tweetChrasLeft").removeClass("grey-color")
+        $("#tweetChrasLeft").removeClass("green-color")
+        $("#tweetChrasLeft").addClass("grey-color")
+      }
+      else if(charCurrent < 0){
+        $("#tweetChrasLeft").removeClass("grey-color")
+        $("#tweetChrasLeft").removeClass("green-color")
+        $("#tweetChrasLeft").addClass("red-color")
+      }
+
+    })
+
     // for posting tweets
     $("#tweet-form").submit(function(event){
       event.preventDefault()
       var formData = $(this).serialize()
-      $.ajax({
-        url:"/api/create/",
-        data: formData,
-        method:"POST",
-        success:function(data){
-          // $(this).find("input[type=text], textarea").val("")
-          $(this).getElementById('tweet-form').reset();
-          attachTweet(data,true)
-        },
-        error:function(data){
-          console.log("Error")
-          console.log(data)
-        }
-      })
+      if(charCurrent >= 0){
+        $.ajax({
+          url:"/api/create/",
+          data: formData,
+          method:"POST",
+          success:function(data){
+            $(this).getElementById('tweet-form').reset();
+            attachTweet(data,true)
+          },
+          error:function(data){
+            console.log("Error")
+            console.log(data)
+          }
+        })
+      }else{
+        console.log("Cant send,Tweet too long");
+      }
+
     })
   });
 </script>
