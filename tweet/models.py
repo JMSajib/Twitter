@@ -6,7 +6,7 @@ from django.conf import settings
 
 class Tweet(models.Model):
     user      = models.ForeignKey(settings.AUTH_USER_MODEL)
-    content   = models.TextField(validators=[validate_content])
+    content   = models.CharField(max_length=255,validators=[validate_content])
     updated   = models.DateTimeField(auto_now=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -14,7 +14,7 @@ class Tweet(models.Model):
         return self.content
 
     def get_absolute_url(self):
-        return reverse("tweet:detail",kwargs={'pk':self.pk})    
+        return reverse("tweet:detail",kwargs={'pk':self.pk})
 
     # def clean(self,*args,**kwargs):
     #     content = self.content

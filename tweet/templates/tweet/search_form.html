@@ -1,8 +1,4 @@
-<div class="row">
-  <div class="col-sm-12 text-center">
-    <form class="form-inline" action='{% url "tweet:list" %}' method="GET">
+    <form class="navbar-form navbar-left" action='{% url "tweet:list" %}' method="GET">
       <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search" value="{{ request.GET.q }}" aria-label="Search">
     <button class="btn btn-success" type="submit">Search</button>
     </form>
-  </div>
-</div>
