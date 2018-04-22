@@ -23,11 +23,12 @@ class TweetListView(ListView):
                     Q(user__username__icontains=query)
                 )
         return qs
+        
     def get_context_data(self,*args,**kwargs):
         context = super(TweetListView,self).get_context_data(*args,**kwargs)
         context['create_form'] = TweetModelForm()
         context['create_url'] = reverse_lazy("tweet:create")
-        return context  
+        return context
 
 class TweetDetailView(DetailView):
     model = Tweet

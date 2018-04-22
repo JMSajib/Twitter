@@ -1,6 +1,58 @@
 {% extends "base.html" %}
-{% block content %}
 
+{% block script %}
+
+<script>
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+  $(document).ready(function(){
+    console.log("Working");
+    var query = getParameterByName('q')
+    var tweetList = [];
+    function parseTweets(){
+      if(tweetList == 0){
+        $("#tweet-container").text("No Tweets currently Found")
+      }else{
+        $.each(tweetList,function(key,value){
+          var tweetKey = key;
+          var tweetContent = value.content;
+          var tweetUser = value.user;
+          $("#tweet-container").append(
+            "<div class=\"media\"><div class=\"media-body\">" + tweetContent + "<br/> via " + tweetUser.username + " | " + "<a href='#'>View</a>" + "</div></div><hr/>"
+          )
+        })
+      }
+    }
+    $.ajax({
+      url:"{% url 'tweet-api:list' %}",
+      data:{
+        "q":query
+      },
+      method:"GET",
+      success:function(data){
+        // console.log(data)
+        tweetList = data
+        parseTweets()
+      },
+      error:function(data){
+        console.log("Error")
+        console.log(data)
+      }
+    })
+  });
+</script>
+{% endblock %}
+
+{% block content %}
   <div class="row">
     <div class="col-sm-3 col-xs-12">
       <h1>{{ request.user }}</h1>
@@ -10,24 +62,10 @@
         <div>
         {% include "tweet/form.html" with form=create_form action_url=create_url btn_title='Tweet' %}
       </div>
-      {% endif %}
-  {% for obj in object_list %}
-    <div class="media">
-      {% if obj.image %}
-        <img class="mr-3" src="..." alt="Generic placeholder image">
-      {% endif %}
-      <div class="media-body">
-        {{obj.content}}<br>
-        via {{obj.user}} | {{obj.timestamp|timesince}} ago | <a href="{{ obj.get_absolute_url }}">view</a>
-      </div>
-    </div><hr>
-    {% empty %}
-      {% if request.GET.q %}
-        <p>No Tweets Found.</p>
-      {% else %}
-        <p>No Tweets yet.</p>
-      {% endif %}
-  {% endfor %}
+      {% endif %}<br>
+    <div id="tweet-container">
+
+    </div>
     </div>
   </div>
 {% endblock %}
