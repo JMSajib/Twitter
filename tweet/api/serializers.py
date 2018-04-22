@@ -3,7 +3,7 @@ from tweet.models import Tweet
 from accounts.api.serializers import UserDisplaySrializser
 
 class TweetModelSerializer(serializers.ModelSerializer):
-    user = UserDisplaySrializser()
+    user = UserDisplaySrializser(read_only=True)
     class Meta():
         model = Tweet
         fields = [

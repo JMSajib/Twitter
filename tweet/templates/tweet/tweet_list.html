@@ -32,21 +32,42 @@ function getParameterByName(name, url) {
         })
       }
     }
-    $.ajax({
-      url:"{% url 'tweet-api:list' %}",
-      data:{
-        "q":query
-      },
-      method:"GET",
-      success:function(data){
-        // console.log(data)
-        tweetList = data
-        parseTweets()
-      },
-      error:function(data){
-        console.log("Error")
-        console.log(data)
-      }
+    function fetchTweets(){
+      $.ajax({
+        url:"/api/",
+        data:{
+          "q":query
+        },
+        method:"GET",
+        success:function(data){
+          // console.log(data)
+          tweetList = data
+          parseTweets()
+        },
+        error:function(data){
+          console.log("Error")
+          console.log(data)
+        }
+      })
+    }
+    fetchTweets()
+    // for posting tweets
+    $("#tweet-form").submit(function(event){
+      event.preventDefault()
+      var formData = $(this).serialize()
+      $.ajax({
+        url:"/api/create/",
+        data: formData,
+        method:"POST",
+        success:function(data){
+          console.log(data)
+          fetchTweets()
+        },
+        error:function(data){
+          console.log("Error")
+          console.log(data)
+        }
+      })
     })
   });
 </script>
@@ -59,8 +80,8 @@ function getParameterByName(name, url) {
     </div>
     <div class="col-sm-9">
       {% if not request.GET.q %}
-        <div>
-        {% include "tweet/form.html" with form=create_form action_url=create_url btn_title='Tweet' %}
+      <div>
+      {% include "tweet/form.html" with form=create_form action_url=create_url btn_title='Tweet' form_id="tweet-form" %}
       </div>
       {% endif %}<br>
     <div id="tweet-container">
