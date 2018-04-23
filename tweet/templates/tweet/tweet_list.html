@@ -18,6 +18,7 @@ function getParameterByName(name, url) {
     console.log("Working");
     var query = getParameterByName('q')
     var tweetList = [];
+    var nextTweetUrl;
 
     function attachTweet(tweetValue,prepend){
       var dateDisplay = tweetValue.date_display;
@@ -41,15 +42,27 @@ function getParameterByName(name, url) {
         })
       }
     }
-    function fetchTweets(){
+    function fetchTweets(url){
+      var fetchUrl;
+      if(!url){
+        fetchUrl = "/api/"
+      }else{
+        fetchUrl = url
+      }
       $.ajax({
-        url:"/api/",
+        url: fetchUrl,
         data:{
           "q":query
         },
         method:"GET",
         success:function(data){
-          tweetList = data
+          tweetList = data.results
+          if(data.next){
+            nextTweetUrl = data.next
+          }else{
+            $("#loadmore").css("display", "none")
+          }
+
           parseTweets()
         },
         error:function(data){
@@ -59,6 +72,13 @@ function getParameterByName(name, url) {
       })
     }
     fetchTweets()
+
+    $("#loadmore").click(function(event){
+      event.preventDefault()
+      if(nextTweetUrl){
+        fetchTweets(nextTweetUrl)
+      }
+    })
 
     var charStart = 140;
     var charCurrent = 0;
@@ -97,7 +117,7 @@ function getParameterByName(name, url) {
           data: formData,
           method:"POST",
           success:function(data){
-            $(this).getElementById('tweet-form').reset();
+            window.location.reload()
             attachTweet(data,true)
           },
           error:function(data){
@@ -128,6 +148,8 @@ function getParameterByName(name, url) {
     <div id="tweet-container">
 
     </div>
+    <a href="#" id="loadmore">Load More Tweets</a>
+    {# <button id="loadmore" class="btn btn-primary btn-sm">Load More Tweets</button> #}
     </div>
   </div>
 {% endblock %}

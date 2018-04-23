@@ -35,6 +35,35 @@
     </div>
     {% block script %}
     {% endblock %}
+
+    <script>
+      $(document).ready(function(){
+        var typingTimer;
+        var doneInterval = 800;
+        // var searchInput = $("#navbar-search-form input[type=text]")
+        var searchQuery;
+        $("#navbar-search-form").keyup(function(event){
+          // console.log(event);
+          searchQuery = $(this).val()
+          clearTimeout(typingTimer)
+          typingTimer = setTimeout(doneSearchTyping, doneInterval)
+        })
+
+      $("#navbar-search-form").keydown(function(event){
+        // console.log(event)
+        clearTimeout(typingTimer)
+      })
+
+      function doneSearchTyping(){
+        if(searchQuery){
+          var url = '/api/?q=' + searchQuery
+          console.log(url);
+          document.location.href = url;
+        }
+      }
+
+      })
+    </script>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
