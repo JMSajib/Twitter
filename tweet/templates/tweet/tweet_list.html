@@ -24,7 +24,7 @@ function getParameterByName(name, url) {
       var dateDisplay = tweetValue.date_display;
       var tweetContent = tweetValue.content;
       var tweetUser = tweetValue.user;
-      var tweetFormatedHtml = "<div class=\"media\"><div class=\"media-body\">" + tweetContent + "<br/> via " + tweetUser.username + " | " + dateDisplay + " | " + "<a href='#'>View</a>" + "</div></div><hr/>"
+      var tweetFormatedHtml = "<div class=\"media\"><div class=\"media-body\">" + tweetContent + "<br/> via <a href='" + tweetUser.url + "'>" + tweetUser.username + "</a> | " + dateDisplay + " | " + "<a href='#'>View</a>" + "</div></div><hr/>"
       if(prepend==true){
         $("#tweet-container").prepend(tweetFormatedHtml)
       }else{
