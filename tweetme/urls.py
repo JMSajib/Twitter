@@ -23,6 +23,7 @@ from .views import home
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('tweet.urls',namespace='tweet')),
+    url(r'^profiles/', include('accounts.urls',namespace='profiles')),
     url(r'^api/', include('tweet.api.urls',namespace='tweet-api')),
 ]
 if settings.DEBUG:
