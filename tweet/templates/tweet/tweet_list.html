@@ -20,6 +20,14 @@ function getParameterByName(name, url) {
     var tweetList = [];
     var nextTweetUrl;
 
+    function updateHashLinks(){
+      $(".media-body").each(function(){
+        var hashtagRegex = /(^|\s)#([\w\d-]+)/g
+        var newText = $(this).html().replace(hashtagRegex,"$1<a href='/tags/$2/'>#$2</a>")
+        $(this).html(newText)
+      })
+    }
+
     function attachTweet(tweetValue,prepend){
       var dateDisplay = tweetValue.date_display;
       var tweetContent = tweetValue.content;
@@ -64,6 +72,7 @@ function getParameterByName(name, url) {
           }
 
           parseTweets()
+          updateHashLinks()
         },
         error:function(data){
           console.log("Error")
@@ -118,7 +127,9 @@ function getParameterByName(name, url) {
           method:"POST",
           success:function(data){
             window.location.reload()
+            // $(this).find("input[type=text], textarea").val("")
             attachTweet(data,true)
+            updateHashLinks()
           },
           error:function(data){
             console.log("Error")
