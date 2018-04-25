@@ -32,7 +32,8 @@ function getParameterByName(name, url) {
       var dateDisplay = tweetValue.date_display;
       var tweetContent = tweetValue.content;
       var tweetUser = tweetValue.user;
-      var tweetFormatedHtml = "<div class=\"media\"><div class=\"media-body\">" + tweetContent + "<br/> via <a href='" + tweetUser.url + "'>" + tweetUser.username + "</a> | " + dateDisplay + " | " + "<a href='#'>View</a>" + "</div></div><hr/>"
+      var isRetweet = tweetValue.is_retweet;
+      var tweetFormatedHtml = "<div class=\"media\">" + isRetweet + "<div class=\"media-body\">" + tweetContent + "<br/> via <a href='" + tweetUser.url + "'>" + tweetUser.username + "</a> | " + dateDisplay + " | " + "<a href='/detail/" + tweetValue.id + "'>View</a>" + "</div></div><hr/>"
       if(prepend==true){
         $("#tweet-container").prepend(tweetFormatedHtml)
       }else{
