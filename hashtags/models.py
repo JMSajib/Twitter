@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse_lazy
 from tweet.models import Tweet
+from .signals import parsed_hashtags
 # Create your models here.
 
 class HashTag(models.Model):
@@ -15,3 +16,10 @@ class HashTag(models.Model):
 
     def get_tweets(self):
         return Tweet.objects.filter(content__icontains="#" + self.tag)
+
+def parsed_hashtags_receiver(sender,hashtag_list,*args,**kwargs):
+    if(len(hashtag_list)>0):
+        for tag_var in hashtag_list:
+            new_tag, create = HashTag.objects.get_or_create(tag=tag_var)
+
+parsed_hashtags.connect(parsed_hashtags_receiver)
