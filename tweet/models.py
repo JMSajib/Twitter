@@ -10,6 +10,9 @@ class TweetManager(models.Manager):
             og_parent = parent_obj.parent
         else:
             og_parent = parent_obj
+        qs = self.get_queryset().filter(user=user,parent=og_parent)
+        if(qs.exists()):
+            return None
         obj = self.model(
                 parent = parent_obj,
                 user = user,

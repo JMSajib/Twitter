@@ -1,10 +1,26 @@
 from rest_framework import generics
 from django.db.models import Q
 from rest_framework import permissions
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from tweet.models import Tweet
 from accounts.models import UserProfile
 from .serializers import TweetModelSerializer
 from .pagination import StandardResultsPagination
+
+class RetWeetAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, pk, format=None):
+        tweet_qs = Tweet.objects.filter(pk=pk)
+        message = "Not Allowed"
+        if(tweet_qs.exists() and tweet_qs.count() == 1):
+            if(request.user.is_authenticated()):
+                new_tweet = Tweet.objects.retweet(request.user,tweet_qs.first())
+                if(new_tweet is not None):
+                    data = TweetModelSerializer(new_tweet).data
+                    return Response(data)
+                message = "Cant Retweet"
+        return Response({"message":message},status=400)
 
 class TweetCreateAPIView(generics.CreateAPIView):
     serializer_class = TweetModelSerializer
