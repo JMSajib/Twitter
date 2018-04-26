@@ -72,8 +72,11 @@
           url: url,
           success: function(data){
             console.log(data)
-            attachTweet(data,true,true)
-            updateHashLinks()
+            if(initialUrl == "/api/"){
+              attachTweet(data,true,true)
+              updateHashLinks()
+            }
+            
           },
           error:function(data){
             console.log("error")
