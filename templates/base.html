@@ -36,6 +36,203 @@
 
       {% endblock %}
     </div>
+
+    <script>
+
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    function loadTweetContainer(tweetContainerID){
+      console.log("Working");
+      var query = getParameterByName('q')
+      var tweetList = [];
+      var nextTweetUrl;
+      var tweetContainer;
+      if(tweetContainerID){
+        tweetContainer = $("#" + tweetContainerID)
+      }else{
+        tweetContainer = $("#tweet-container")
+      }
+
+      var initialUrl = tweetContainer.attr("data-url") || "/api/";
+      console.log(initialUrl);
+
+      $(document.body).on("click",".retweet",function(e){
+        e.preventDefault();
+        var url = "/api" + $(this).attr("href")
+        $.ajax({
+          method: "GET",
+          url: url,
+          success: function(data){
+            console.log(data)
+            attachTweet(data,true,true)
+            updateHashLinks()
+          },
+          error:function(data){
+            console.log("error")
+            console.log()
+          }
+        })
+      })
+
+      function updateHashLinks(){
+        $(".media-body").each(function(){
+          var hashtagRegex = /(^|\s)#([\w\d-]+)/g
+          var usernameRegex = /(^|\s)@([\w\d-]+)/g
+          var currentHtml = $(this).html()
+          var newText;
+          newText = currentHtml.replace(hashtagRegex,"$1<a href='/tags/$2/'>#$2</a>")
+
+          newText = newText.replace(usernameRegex,"$1@<a href='/$2/'>$2</a>")
+          $(this).html(newText)
+        })
+      }
+
+      function attachTweet(tweetValue,prepend,retweet){
+        var dateDisplay = tweetValue.date_display;
+        var tweetContent = tweetValue.content;
+        var tweetUser = tweetValue.user;
+        var tweetFormatedHtml;
+
+        if(retweet && tweetValue.parent){
+          //retweet
+          var mainTweet = tweetValue.parent
+          tweetFormatedHtml = "<div class=\"media\"><div class=\"media-body\"><span class='light-blue'>Retweet via " + tweetUser.username + " on " + dateDisplay + "</span><br/>" + mainTweet.content +
+          "<br/> via <a href='" + mainTweet.user.url + "'>" + mainTweet.user.username + "</a> | " + mainTweet.date_display + " | " +
+          "<a href='/detail/" + mainTweet.id + "'>View</a> | " + "<a class='retweet' href='/retweet/" + tweetValue.id + "'>Retweet</a>" + "</div></div><hr/>"
+
+        } else{
+          //fresh tweet
+          tweetFormatedHtml = "<div class=\"media\"><div class=\"media-body\">" + tweetContent + "<br/> via <a href='"
+          + tweetUser.url + "'>" + tweetUser.username + "</a> | " + dateDisplay + " | " + "<a href='/detail/" + tweetValue.id +
+          "'>View</a> | " + "<a class='retweet' href='/retweet/" + tweetValue.id + "'>Retweet</a>" + "</div></div><hr/>"
+
+        }
+
+        if(prepend==true){
+          tweetContainer.prepend(tweetFormatedHtml)
+        }else{
+          tweetContainer.append(tweetFormatedHtml)
+        }
+      }
+
+      function parseTweets(){
+        if(tweetList == 0){
+          tweetContainer.text("No Tweets currently Found")
+        }else{
+          $.each(tweetList,function(key,value){
+            var tweetKey = key;
+            if(value.parent){
+              attachTweet(value,false,true)
+            } else{
+              attachTweet(value)
+            }
+
+          })
+        }
+      }
+      function fetchTweets(url){
+        var fetchUrl;
+        if(!url){
+          fetchUrl = "/api/"
+        }else{
+          fetchUrl = url
+        }
+        $.ajax({
+          url: fetchUrl,
+          data:{
+            "q":query
+          },
+          method:"GET",
+          success:function(data){
+            tweetList = data.results
+            if(data.next){
+              nextTweetUrl = data.next
+            }else{
+              $("#loadmore").css("display", "none")
+            }
+
+            parseTweets()
+            updateHashLinks()
+          },
+          error:function(data){
+            console.log("Error")
+            console.log(data)
+          }
+        })
+      }
+      fetchTweets()
+
+      $("#loadmore").click(function(event){
+        event.preventDefault()
+        if(nextTweetUrl){
+          fetchTweets(nextTweetUrl)
+        }
+      })
+
+      var charStart = 140;
+      var charCurrent = 0;
+      $("#tweet-form").append("<span id='tweetChrasLeft'>140</span>")
+
+      $("#tweet-form textarea").keyup(function(event){
+        var tweetValue = $(this).val()
+        charCurrent = charStart - tweetValue.length
+        $("#tweetChrasLeft").text(charCurrent)
+
+        if(charCurrent > 0){
+          $("#tweetChrasLeft").removeClass("grey-color")
+          $("#tweetChrasLeft").removeClass("red-color")
+          $("#tweetChrasLeft").addClass("green-color")
+        }
+        else if(charCurrent == 0){
+          $("#tweetChrasLeft").removeClass("grey-color")
+          $("#tweetChrasLeft").removeClass("green-color")
+          $("#tweetChrasLeft").addClass("grey-color")
+        }
+        else if(charCurrent < 0){
+          $("#tweetChrasLeft").removeClass("grey-color")
+          $("#tweetChrasLeft").removeClass("green-color")
+          $("#tweetChrasLeft").addClass("red-color")
+        }
+
+      })
+
+      // for posting tweets
+      $("#tweet-form").submit(function(event){
+        event.preventDefault()
+        var formData = $(this).serialize()
+        if(charCurrent >= 0){
+          $.ajax({
+            url:"/api/create/",
+            data: formData,
+            method:"POST",
+            success:function(data){
+              window.location.reload()
+              // $(this).find("input[type=text], textarea").val("")
+              attachTweet(data,true)
+              updateHashLinks()
+            },
+            error:function(data){
+              console.log("Error")
+              console.log(data)
+            }
+          })
+        }else{
+          console.log("Cant send,Tweet too long");
+        }
+
+      })
+    }
+
+    </script>
+
     {% block script %}
     {% endblock %}
 
