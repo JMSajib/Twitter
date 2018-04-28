@@ -31,12 +31,13 @@ class TweetManager(models.Manager):
         else:
             is_liked = True
             tweet_obj.liked.add(user)
-        return is_liked       
+        return is_liked
 
 class Tweet(models.Model):
     parent    = models.ForeignKey("self",blank=True,null=True)
     user      = models.ForeignKey(settings.AUTH_USER_MODEL)
     liked     = models.ManyToManyField(settings.AUTH_USER_MODEL,blank=True,related_name='liked')
+    reply     = models.BooleanField(verbose_name="Is a Reply?", default=False)
     content   = models.CharField(max_length=140,validators=[validate_content])
     updated   = models.DateTimeField(auto_now=True)
     timestamp = models.DateTimeField(auto_now_add=True)
